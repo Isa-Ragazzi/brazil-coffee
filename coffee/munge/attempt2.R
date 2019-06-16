@@ -15,6 +15,7 @@ values <- extract(r, points)
 
 df <- cbind.data.frame(coordinates(points), values)
 
-summary (df)
+head (df)
 
-plot(df)
+plot(r[[1]])
+plot(points, add=T)
