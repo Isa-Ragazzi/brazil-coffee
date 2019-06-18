@@ -38,37 +38,41 @@ plot(brazil_r)
 bahia_r <- crop(r, bahia$spdf@bbox)
 plot(bahia_r)
 
-# extract all points and values for all variables in Brazil
+###### extract all points and values for all variables in Brazil ######
 points <- spsample(as(brazil_r@extent, 'SpatialPolygons'), n=100, type="random")
 values <- raster:: extract(brazil_r, points)
-# bind into df
+
+###### bind into df ######
 df <- cbind.data.frame(coordinates(points), values)
 plot(df)
 summary (df)
 
-# extract points and values for bahia
+###### extract points and values for bahia ####
 region_points <- spsample(as(bahia_r@extent, 'SpatialPolygons'), n=100, type="random")
 region_values <- raster:: extract(bahia_r, region_points) 
 
-# bind into df
+##### bind into df ####
 region_df <- cbind.data.frame(coordinates(region_points), region_values)
 region_df$region <- "bahia"
 plot(region_df)
 summary (region_df)
 
-# create function to extract data by region
-
+######## extract data by region ########
 region_names <- listNames(BRA, level = 1)
 
-function(x) {
-  for(x in region_names) {
+# list(region_names)
+output <- data_frame()
+
+for(x in region_names) {
     x <- gadm_subset(BRA, level = 1, regions = x)
+    # print(x$spdf$NAME_1)
     region_r <- crop(r, x$spdf@bbox)
     region_points <- spsample(as(region_r@extent, 'SpatialPolygons'), n=100, type="random")
     region_values <- raster:: extract(region_r, region_points) 
     region_df <- cbind.data.frame(coordinates(region_points), region_values)
-    region_df$region <- x
-    
+    region_df$region <- x$spdf$NAME_1
+    output <- rbind(output, region_df)
   }
-}
 
+## this is wrong, but initial attempt at summarising variables by region
+region_gp <- output %>% group_by(region) %>% summarise_all(list(~mean))
