@@ -32,11 +32,11 @@ r <- getData("worldclim",var="bio", res=10)
 
 ## extract Brazil coordinates from r
 brazil_r <- crop(r, bbox(BRA$spdf@bbox))
-plot(brazil_r)
+plot(brazil_r, "bio1")
 
 ## extract bahia region coordinates from r
 bahia_r <- crop(r, bahia$spdf@bbox)
-plot(bahia_r)
+plot(bahia_r, "bio1")
 
 ###### extract all points and values for all variables in Brazil ######
 points <- spsample(as(brazil_r@extent, 'SpatialPolygons'), n=100, type="random")

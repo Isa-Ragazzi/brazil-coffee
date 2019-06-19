@@ -1,14 +1,18 @@
 ## import climate scenarios
 
-HG_model <- getData('CMIP5', var='tmax', res=10, rcp=85, model='HG', year=50)
+HG_model <- getData('CMIP5', var='bio', res=10, rcp=85, model='CN', year=50)
 BC_model <- getData('CMIP5', var='bio', res=10, rcp=85, model='BC', year=50)
 
-plot(AC_model)
+# bio 1 variable comparison
+plot(HG_model, 1)
+plot(r, 1)
+# plot HG model layer 3 for Brazil
+brazil_hg <- crop(HG_model, bbox(BRA$spdf))
+plot(brazil_hg, 3)
 
-points <- spsample(as(HG_model@extent, 'SpatialPolygons'), n=100, type="random")
+## creating a dataframe
+points <- spsample(as(brazil_hg@extent, 'SpatialPolygons'), n=234, type="random")
 values <- raster:: extract(HG_model, points)
 
-brazil_hg <- crop(points, bbox(BRA$spdf))
-plot(brazil_hg)
 # bind into df
 df <- cbind.data.frame(coordinates(points), values)
