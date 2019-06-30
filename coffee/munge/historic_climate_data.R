@@ -162,6 +162,9 @@ all_climate <- all_climate %>% full_join(tmin, by=c("x","y","year"))
 
 all_climate <- all_climate %>% full_join(precip, by=c("x","y","year"))
 
-## Fizz can you look into summarising each column in the "all climate" data by region? I can't 
+# write.csv(all_climate, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/all_climate.csv", row.names = FALSE)
+# Fizz, I can't upload the OG files because they are too large, but I've saved the output (all_climate) 
+# in the "data" folder
+## can you look into summarising each column in the "all climate" data by region? I can't 
 ## figure out how to group the lat/long points based on their region
 
