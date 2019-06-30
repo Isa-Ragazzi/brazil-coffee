@@ -162,9 +162,15 @@ all_climate <- all_climate %>% full_join(tmin, by=c("x","y","year"))
 
 all_climate <- all_climate %>% full_join(precip, by=c("x","y","year"))
 
-# write.csv(all_climate, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/all_climate.csv", row.names = FALSE)
-# Fizz, I can't upload the OG files because they are too large, but I've saved the output (all_climate) 
+all_climate_pt_1 <- all_climate[1:162000,]
+all_climate_pt_2 <- all_climate[162001:324000,]
+write.csv(all_climate_pt_1, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/all_climate_pt_1.csv", row.names = FALSE)
+write.csv(all_climate_pt_2, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/all_climate_pt_2.csv", row.names = FALSE)
+
+# Fizz, I can't upload the OG files because they are too large, but I've saved the output (all_climate_pt_1 and pt_2) 
 # in the "data" folder
+## run this to recombine: 
+all_climate <- rbind(all_climate_pt_1,all_climate_pt_2)
 ## can you look into summarising each column in the "all climate" data by region? I can't 
 ## figure out how to group the lat/long points based on their region
 
