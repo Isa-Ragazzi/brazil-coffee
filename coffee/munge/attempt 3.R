@@ -18,6 +18,7 @@ gadm_plot(BRA)
 # extracting one region at a time
 
 bahia <- gadm_subset(BRA, level = 1, regions = "Bahia")
+mg <- gadm_subset(BRA, level = 1, regions = "Minas Gerais")
 
 #gadm_plot(bahia) #%>% gadm_showNorth("tl") %>% gadm_showScale('bl')
 
@@ -36,7 +37,7 @@ plot(brazil_r, "bio1")
 
 ## extract bahia region coordinates from r
 bahia_r <- crop(r, bahia$spdf@bbox)
-plot(bahia_r, "bio1")
+bio1_bahia <- plot(bahia_r, "bio1")
 
 ###### extract all points and values for all variables in Brazil ######
 points <- spsample(as(brazil_r@extent, 'SpatialPolygons'), n=100, type="random")
