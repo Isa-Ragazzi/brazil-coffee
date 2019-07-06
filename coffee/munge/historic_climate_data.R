@@ -162,6 +162,18 @@ all_climate <- all_climate %>% full_join(tmin, by=c("x","y","year"))
 
 all_climate <- all_climate %>% full_join(precip, by=c("x","y","year"))
 
+# remove unnecessary intermediary datasets
+remove(tmn_values, tmn.2001, tmn, tmn.1991,tmx, tmx.2001, tmx.1991, pre, pre.2001, pre.1991,mg_pre, pre.sites,
+       pre.sites.loc,pre.sites.years, pre.1991.sites, pre.1991.sites, pre.1991.sites.loc, pre.1991.sites.years,
+       pre.2001, pre.2001.sites,pre.2001.sites.loc,pre.2001.sites.years, precipitation_values, precipitation.1991_values,
+       precipitation.2001_values, tmx, tmx_values, tmx.1991_values, tmp, tmp.1991, tmp.2001, tmp_values, tmp.1991_values, tmp.2001_values, tmp.sites,
+       tmp.1991.sites, tmp.1991.sites.loc, tmp.1991.sites.years, tmp.2001.sites, tmp.2001.sites.loc, tmp.2001.sites.years,
+       temp_total, tmx.1991.sites, tmx.1991.sites.loc, tmx.1991.sites.years, tmx.2001.sites, tmx.2001.sites.loc,
+       tmx.2001.sites.years, tmx.2001_values, tmn.sites, tmn.sites.loc, tmn.sites.year, tmn.sites.years, tmx.sites.years, 
+       tmp.sites.years, tmx.sites, tmx.sites.loc,tmx.sites.year,tmp.sites.loc, tmp.sites.year, tmn_values, tmn.1991_values,
+       tmn.1991.sites, tmn.1991.sites.loc, tmn.1991.sites.years, tmn.2001.sites, tmn.2001.sites.loc, tmn.2001.sites.years, tmn.2001_values, tmax, tmin)
+
+
 all_climate_pt_1 <- all_climate[1:162000,]
 all_climate_pt_2 <- all_climate[162001:324000,]
 write.csv(all_climate_pt_1, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/all_climate_pt_1.csv", row.names = FALSE)
@@ -170,7 +182,27 @@ write.csv(all_climate_pt_2, file = "/Users/isabellaragazzi/brazil-coffee/coffee/
 # Fizz, I can't upload the OG files because they are too large, but I've saved the output (all_climate_pt_1 and pt_2) 
 # in the "data" folder
 ## run this to recombine: 
-all_climate <- rbind(all_climate_pt_1,all_climate_pt_2)
-## can you look into summarising each column in the "all climate" data by region? I can't 
-## figure out how to group the lat/long points based on their region
+# all_climate <- rbind(all_climate_pt_1,all_climate_pt_2)
+
+# for loop to assign regions
+temp_output <- data_frame()
+
+for(y in region_names) {
+  y <- gadm_subset(BRA, level = 1, regions = y)
+  temp_region_r <- crop(locations, y$spdf@bbox)
+  region_points <- temp_region_r@coords
+  temp_region_df <- as.data.frame(region_points)
+  temp_region_df$region <- y$spdf$NAME_1
+  temp <- left_join(temp_region_df, all_climate, by = c("x","y"))
+  temp <- temp %>% separate(year, c("year", "month"), sep= "_")
+  temp_output <- rbind(temp_output, temp)
+  remove(temp_region_r, region_points, temp_region_df, temp)
+}
+
+# summary of weather conditions by region
+
+summary <- temp_output %>% group_by(region, year, month) %>% summarize(avgtmp = mean(avgtmp, na.rm = TRUE), 
+                                                                tmax = mean(tmax, na.rm = TRUE),
+                                                                tmin = mean(tmin, na.rm = TRUE),
+                                                                precip = mean(precip, na.rm = TRUE))
 
