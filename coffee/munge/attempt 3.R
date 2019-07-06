@@ -61,7 +61,7 @@ summary (region_df)
 ######## extract data by region ########
 region_names <- listNames(BRA, level = 1)
 
-# list(region_names)
+# assign regions
 output <- data_frame()
 
 for(x in region_names) {
@@ -74,6 +74,3 @@ for(x in region_names) {
     region_df$region <- x$spdf$NAME_1
     output <- rbind(output, region_df)
   }
-
-## this is wrong, but initial attempt at summarising variables by region
-region_gp <- output %>% group_by(region) %>% summarise_all(list(~mean))
