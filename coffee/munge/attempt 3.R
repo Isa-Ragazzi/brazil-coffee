@@ -33,7 +33,7 @@ r <- getData("worldclim",var="bio", res=10)
 
 ## extract Brazil coordinates from r
 brazil_r <- crop(r, bbox(BRA$spdf@bbox))
-plot(brazil_r, "bio1")
+plot(BRA, "bio1")
 
 ## extract bahia region coordinates from r
 bahia_r <- crop(r, bahia$spdf@bbox)

@@ -5,6 +5,7 @@ library(dplyr)
 library(spData)
 library(spDataLarge)
 library(brazilmaps)
+
 ## import climate scenarios
 HG_model <- getData('CMIP5', var='bio', res=10, rcp=85, model='CN', year=50)
 BC_model <- getData('CMIP5', var='bio', res=10, rcp=85, model='BC', year=50)
@@ -13,4 +14,6 @@ BC_model <- getData('CMIP5', var='bio', res=10, rcp=85, model='BC', year=50)
 bra <- get_brmap(geo ="Region",
           geo.filter = NULL,
           class = "sf")
-plot_brmap(bra)
+tm_shape(bra)+
+  tm_fill()+
+  tm_borders()
