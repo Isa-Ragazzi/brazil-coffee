@@ -35,3 +35,15 @@ future_coffee <- left_join(bunn_output, future_summary, by = "region")
 future_coffee = future_coffee[,c(-4,-5)]
 names(future_coffee)[names(future_coffee)=='x.x']<-"x"
 names(future_coffee)[names(future_coffee)=='y.x']<-"y"
+
+###############################################3
+# attempting to plot his data
+library(maps)
+library(mapdata)
+library(ggplot2)
+
+map("Brazil")
+bra <- ggplot2::map_data('brazil')
+dim(bra)
+head(bra)
+area_harvest <- Area_Harvested_with_Code_20120704
