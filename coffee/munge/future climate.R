@@ -87,3 +87,5 @@ future_sum <- future_summary %>% select("region","BIO_1_Annual Mean Temp", "BIO_
                                         "BIO_13_Precipitation of Wettest Month", "BIO_14_Precipitation of Driest Month", "BIO_17_Precipitation of Driest Quarter")
 future_sum = left_join(future_sum, total_drought, by = "region")
 
+# write.csv
+write.csv(future_sum, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/future_sum.csv", row.names = FALSE)
