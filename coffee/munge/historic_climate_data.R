@@ -6,8 +6,8 @@ years <- 2011:2017
 years.2001 <- 2001:2010
 years.1991 <- 1991:2000
 month <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+month_order <- read.csv("/Users/isabellaragazzi/brazil-coffee/coffee/data/month_order.csv")
 
-  
 # Load packages
 library(ncdf4)
 library(raster)
@@ -69,7 +69,7 @@ tmx.2001 <- brick("/Users/isabellaragazzi/brazil-coffee/coffee/data/cru_ts4.02.2
 tmx.1991 <- brick("/Users/isabellaragazzi/brazil-coffee/coffee/data/cru_ts4.02.1991.2000.tmx.dat.nc", varname="tmx") # max monthly temperature 1991-2000
 
 
-tmp <- brick("/Users/isabellaragazzi/brazil-coffee/coffee/cru_ts4.02.2011.2017.tmp.dat 2.nc", varname="tmp") # Mean monthly temperature
+tmp <- brick("/Users/isabellaragazzi/brazil-coffee/coffee/data/cru_ts4.02.2011.2017.tmp.dat 2.nc", varname="tmp") # Mean monthly temperature
 tmp.2001 <- brick("/Users/isabellaragazzi/brazil-coffee/coffee/data/cru_ts4.02.2001.2010.tmp.dat.nc", varname="tmp") # 2001-2010 Mean monthly temperature
 tmp.1991 <- brick("/Users/isabellaragazzi/brazil-coffee/coffee/data/cru_ts4.02.1991.2000.tmp.dat.nc", varname="tmp") # 1991-2000 Mean monthly temperature
 
@@ -199,10 +199,105 @@ for(y in region_names) {
   remove(temp_region_r, region_points, temp_region_df, temp)
 }
 
+# finding months with more than 40 mm rain vs through with under 40mm (drought conditions) - takes a long time to run
+# temp_output2 <- data_frame()
+temp_output1 <- temp_output %>% mutate(drought = NA)
+for(row in 1:nrow(temp_output1)) {
+   if(is.na(temp_output1$precip[[row]])) {
+     temp_output1$drought[[row]] <- NA
+   } else if (temp_output1$precip[[row]] > 40) { 
+      temp_output1$drought[[row]] <- 1
+    } else
+    {temp_output1$drought[[row]] <- 0}
+}
+
+# monthly summary for each region
+temp_output2 <- temp_output1
+
+temp_output2 <- temp_output2 %>%  group_by(region, year, month) %>% summarise(avgtmp = mean(avgtmp, na.rm = TRUE), 
+tmax = mean(tmax, na.rm = TRUE),
+tmin = mean(tmin, na.rm = TRUE),
+precip = mean(precip, na.rm = TRUE), drought = mean(drought, na.rm = TRUE))
+
+# ordering the data chronologically
+temp_output2 = as.data.frame(temp_output2)
+temp_output2 = temp_output2 %>% merge(month_order, by = "month")
+
+# make ID columns to assure chronological order by region, year, month
+temp_output2 <- temp_output2 %>% 
+  mutate(regionID = group_indices(., region), yearID = group_indices(., year), monthID = month_order)
+
+
+temp_output3 <- temp_output2[order(temp_output2$regionID, temp_output2$yearID, temp_output2$monthID),]
+temp_output3 = temp_output3[,-9]
+
+## function to extract regions from dataset ## in progress - create a "functions" script - problem is 2 x
+df <- data_frame()
+extract_region1 <- function(x) {
+  df <- temp_output3 %>% filter(region == `x`) 
+  df$id <-  seq.int(nrow(df))
+  #years_with_drought <- data_frame()
+  id_list <- unique(df$id)
+  return(df)
+  }
+  
+extract_region2 <- function(y) { for(y in id_list) {
+    if(((df$drought[[y]]<=.5) & (df$drought[[y+1]]<=.5) & 
+        (df$drought[[y+2]]<=.5) & (df$drought[[y+3]]<=.5))) 
+    {  print(id)
+      droughtyear <- as.data.frame(paste(df$year[[y]],df$region[[y]]))
+      #droughtregion <- as.data.frame(paste(temp_output2$region[[id]], ))
+      years_with_drought <- as.data.frame(rbind(years_with_drought, droughtyear))
+      #years_with_drought <- as.data.frame(cbind(years_with_drought, droughtregion))
+      return(years_with_drought)
+    } else {next}
+}}
+  
+
+
+# testing function to extract region from dataset - see function in "functions" script
+region_1 <- "Alagoas"
+extract_region1("Alagoas")
+drought_yr <- data.frame()
+for(region in region_names) {
+ # isa <- extract_region(region)
+  drought_yr <- rbind(drought_yr, isa)
+  }
+  
+
+
+# just the unique values (allowing for data to mix regions)
+# years_with_drought <- data_frame()
+# id_list <- unique(temp_output2$id)
+# for(id in id_list) {
+#   if(((temp_output3$drought[[id]]==0) & (temp_output3$drought[[id+1]]==0) & 
+#     (temp_output3$drought[[(id+2)]]==0) & (temp_output3$drought[[(id+3)]]==0)))
+#                  {  print(id)
+#       droughtyear <- as.data.frame(paste(temp_output3$year[[id]],temp_output3$region[[id]]))
+#                  #droughtregion <- as.data.frame(paste(temp_output2$region[[id]], ))
+#                  years_with_drought <- as.data.frame(rbind(years_with_drought, droughtyear))
+#                  #years_with_drought <- as.data.frame(cbind(years_with_drought, droughtregion))
+#   } else {next}
+#   }
+
+drought_year_region <- years_with_drought %>% tidyr:: separate(`paste(df$year[[x]], df$region[[x]])`, c("year", "region"), sep= " ", extra = "merge")
+drought_year_region$drought <- 1
+drought_year_region = unique(drought_year_region)
+
 # summary of weather conditions by region
 
-summary <- temp_output %>% group_by(region, year, month) %>% summarize(avgtmp = mean(avgtmp, na.rm = TRUE), 
+summary <- temp_output1 %>% group_by(region, year, month) %>% summarize(avgtmp = mean(avgtmp, na.rm = TRUE), 
                                                                 tmax = mean(tmax, na.rm = TRUE),
                                                                 tmin = mean(tmin, na.rm = TRUE),
-                                                                precip = mean(precip, na.rm = TRUE))
-
+                                                                precip = mean(precip, na.rm = TRUE)) 
+                                                
+annual_summary <- temp_output2 %>% group_by(region, year) %>% summarize(avgtmp = mean(avgtmp, na.rm = TRUE), 
+                                                                               tmax = max(tmax, na.rm = TRUE),
+                                                                               tmin = min(tmin, na.rm = TRUE),
+                                                                               precip = mean(precip, na.rm = TRUE))
+annual_summary$id <- seq.int(nrow(annual_summary))
+                                       
+tmp <- inner_join(annual_summary, drought_year_region, by = c("region", "year"))                              
+tmp = tmp[,7:8]
+tmp2 <- left_join(annual_summary, tmp, by = c("id"))                                                                  
+tmp2$drought[is.na(tmp2$drought)] <- 0
