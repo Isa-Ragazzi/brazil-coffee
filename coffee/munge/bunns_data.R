@@ -41,9 +41,37 @@ names(future_coffee)[names(future_coffee)=='y.x']<-"y"
 library(maps)
 library(mapdata)
 library(ggplot2)
+library(rgdal)
+library(sp)
+library(raster)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(purrr)
+library(geonames)
 
-map("Brazil")
-bra <- ggplot2::map_data('brazil')
-dim(bra)
-head(bra)
-area_harvest <- Area_Harvested_with_Code_20120704
+df <- read.csv("C:/Users/fishaikh/Documents/7_SSIRF/brazil-coffee/coffee/data/Area Harvested with Code_100.csv")
+df <- data.frame(df)
+head(df)
+
+options(geonamesUsername = "fizzys")
+places <- c(df$Municipality)
+
+get_coords <- function(name, country, fcode){
+    res <- GNsearch(name_equals = name, country=country, fcode=fcode)
+    out <- data.frame(name = res$toponymName, lat=res$lat, lon= res$lng)
+    return(out)
+}
+
+GNresult <- places %>%
+    map(get_coords, country = "BR", fcode = "ADM2") %>%
+    rbindlist()
+print(GNresult)
+
+df <- mutate(df, Latitude = GNresult$lat)
+df <- mutate(df, Longitude = GNresult$lon)
+
+bra2 <- getData('GADM', country='BRA', level=2)
+plot(bra2, border='gray', col='light gray')
+
+mapPoints <- bra2 + geom_point(aes(x = lon, y = lat, size = "Average '06-'10", data = df, alpha = 0.5))
