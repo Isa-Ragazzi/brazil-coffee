@@ -251,6 +251,11 @@ historic_sum <- left_join(annual_summary, all_drought, by = c("region","year"))
 # write.csv to data file
 write.csv(historic_sum, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/historic_sum.csv", row.names = FALSE)
 
+# manually change historic sum regions to deal with accent marks, added year 
+historic_sum_fixed <- read_csv("brazil-coffee/coffee/data/clean/historic_sum_fixed.csv")
+historic_sum_fixed = historic_sum_fixed[,c(1:13)]
+
+
 # Additional monthly summary for each region - not needed in ultimate output
 monthly_sum <- temp_output2 %>%  group_by(region, year, month) %>% summarise(avgtmp = mean(avgtmp, na.rm = TRUE), 
                                                                              tmax = mean(tmax, na.rm = TRUE),

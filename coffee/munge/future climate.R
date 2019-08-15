@@ -89,3 +89,7 @@ future_sum = left_join(future_sum, total_drought, by = "region")
 
 # write.csv
 write.csv(future_sum, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/future_sum.csv", row.names = FALSE)
+
+#manually change future sum regions to deal with accent marks
+future_sum_fixed <- read_csv("brazil-coffee/coffee/data/clean/future_sum_fixed.csv")
+View(future_sum_fixed)
