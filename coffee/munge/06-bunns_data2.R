@@ -188,6 +188,9 @@ combo33 <- data.frame(combo_tmp1, fit2$cluster)
 # summarize the AEZs
 combo4 <- aggregate(combo_2050_cluster,by=list(fit$cluster),FUN=mean)
 combo44 <- aggregate(combo_tmp1,by=list(fit2$cluster),FUN=mean)
+
+aez_summary <- combo44
+write.csv(aez_summary, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/aez_summary")
 # 4 zones, 1 Hot - Dry, 2 Cool- Wet, 3 Cool - Dry, 4 Hot - Wet
 
 # one way ANOVA We want to know if there is any significant difference between the average variables for each AEZ
@@ -220,7 +223,7 @@ summary(res.aov) # Summary of the analysis
 res.aov <- aov(drought ~ fit.cluster, data = combo3)
 summary(res.aov) # Summary of the analysis
 
-## combo33 has AEZs 
+## combo33 has AEZs CURRENT CLIMATE
 # save output
 write.csv(combo33, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/combo33")
 read.csv("/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/combo33")
@@ -265,6 +268,7 @@ sqrt(mean(error^2))
 mapping_clusters <- left_join(combo_tmp, combo33, by = c("avgtmp","tmax","tmin","precipitation",
                                                          "pmax","pmin","drought"))
 mapping_clusters = unique(mapping_clusters)
+write.csv(mapping_clusters, file = "/Users/isabellaragazzi/brazil-coffee/coffee/data/clean/mapping_clusters")
 
 library(ggplot2)
 library(GADMTools)
