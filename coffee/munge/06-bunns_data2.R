@@ -243,7 +243,8 @@ split <- round(nrow(shuffled_fit)*.8)
 train <- shuffled_fit[1:split,]
 test <- shuffled_fit[(split+1):(nrow(shuffled_fit)),] 
 
-#initial model 
+#initial model - Fizzah please look at this and see what you think, I was just messing around with the function 
+# so it may not be the best model, if you know how to check the validity of the model please do so
 install.packages("caret")
 library(caret)
 
