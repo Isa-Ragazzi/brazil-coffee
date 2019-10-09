@@ -296,7 +296,7 @@ test <- shuffled_fit[(split+1):(nrow(shuffled_fit)),]
 
 (fmla <- as.factor(fit.cluster) ~ pwarmest + diurnal_range + pseasonality + tmax + tmin + precipitation)
 model <- train(fmla, train, method = "ranger", trControl = trainControl(
-  method = "cv", number = 5))
+  method = "cv", number = 5), num.trees = 1000)
 summary(model)
 
 #prediction on test dataset
